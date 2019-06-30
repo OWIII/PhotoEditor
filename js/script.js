@@ -1,13 +1,17 @@
+
+
 (async function() {
   const canvas = document.getElementById('canvas')
   const context = canvas.getContext('2d')
-  const image = await loadImage('space.jpg')
+  const originalImage = await loadImage('space.jpg')
   const mouse = getMouse(canvas)
 
   const filterGrayInput = document.getElementById('filterGray')
   const filterRedInput = document.getElementById('filterRed')
   const filterBlueInput = document.getElementById('filterBlue')
   const filterGreenInput = document.getElementById('filterGreen')
+
+  let image = originalImage
 
   const imageParams = {
     offsetX: 0,
@@ -42,7 +46,9 @@
 
     context.drawImage(
       image,
-      0, 0, image.width, image.height,
+      0, 0, 
+      image.width, 
+      image.height,
       imageParams.offsetX,
       imageParams.offsetY,
       image.width * imageParams.scale,
@@ -57,24 +63,39 @@
   }
 
   filterGrayInput.addEventListener('change', () => {})
-	filterRedInput.addEventListener('change', () => {
-		const canvas = document.createElement('canvas')
-		const contex = canvas.getContext('2d')
-		canvas.width = image.width
-		canvas.height = image.height
-		contex.drawImage(
-			image,
-			0, 0, image.width, image.height,
-			0, 0, image.width, image.height
-			)
-		
-		const imageData = context.getImageData(0, 0, canvas.width, canvas.height)
-		console.log(imageData)
-	})
-	filterBlueInput.addEventListener('change', () => {
-		console.log('filterBlueInput fired', filterBlueInput.checked)
-	})
-	filterGreenInput.addEventListener('change', () => {
-		console.log('filterGreenInput fired', filterGreenInput.checked)
-	})
+  filterRedInput.addEventListener('change', () => {
+    const canvas = document.createElement('canvas')
+    const context = canvas.getContext('2d')
+
+    canvas.width = image.width
+    canvas.height = image.height
+    context.drawImage(
+      image,
+      0, 0, image.width, image.height,
+      0, 0, image.width, image.height
+    )
+
+    const imageData = context.getImageData(0, 0, canvas.width, canvas.height)
+    for (let i = 0; 1 < imageData.data.length; i += 4) {
+      imageData.data[i] = 0
+    }
+
+    context.putImageData(
+      imageData,
+      0,
+      0,
+      0,
+      0,
+      image.width,
+      image.height
+    )
+
+    image = canvas
+  })
+  filterBlueInput.addEventListener('change', () => {
+    console.log('filterBlueInput fired', filterBlueInput.checked)
+  })
+  filterGreenInput.addEventListener('change', () => {
+    console.log('filterGreenInput fired', filterGreenInput.checked)
+  })
 })()
